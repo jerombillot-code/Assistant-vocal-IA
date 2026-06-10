@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot Vocal IA — Groq</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
+  .card { background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.1); width: 100%; max-width: 520px; overflow: hidden; }
+  .header { background: #1a1a2e; color: #fff; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .header h1 { font-size: 16px; font-weight: 600; }
+  .header p { font-size: 12px; color: #a0a0c0; margin-top: 2px; }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; margin-left: auto; white-space: nowrap; }
+  .setup { padding: 1rem 1.5rem; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
+  .setup label { font-size: 12px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px; }
+  .key-row { display: flex; gap: 8px; }
+  .key-row input { flex: 1; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; outline: none; transition: border 0.2s; }
+  .key-row input:focus { border-color: #4f46e5; }
+  .key-row button { padding: 8px 16px; background: #4f46e5; color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .key-row button:hover { background: #4338ca; }
+  .setup-hint { font-size: 11px; color: #999; margin-top: 6px; }
+  .setup-hint a { color: #4f46e5; text-decoration: none; }
+  .voice-row { padding: 0.75rem 1.5rem; border-bottom: 1px solid #f0f0f0; }
+  .voice-row select { width: 100%; padding: 7px 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; background: #fff; outline: none; }
+  .messages { height: 280px; overflow-y: auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+  .msg { padding: 9px 14px; border-radius: 16px; max-width: 80%; font-size: 14px; line-height: 1.5; }
+  .msg.user { background: #4f46e5; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg.bot { background: #f0f0f5; color: #1a1a2e; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.typing { color: #aaa; font-style: italic; }
+  .controls { padding: 1rem 1.5rem; border-top: 1px solid #f0f0f0; display: flex; flex-direction: column; gap: 10px; }
+  .mic-row { display: flex; align-items: center; gap: 12px; }
+  #micBtn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #e0e0e0; background: #fff; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  #micBtn:hover { border-color: #4f46e5; }
+  #micBtn.listening { background: #fee2e2; border-color: #ef4444; animation: pulse 1s infinite; }
+  #micBtn.speaking { background: #dcfce7; border-color: #22c55e; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+  #status { font-size: 13px; color: #888; }
+  .text-row { display: flex; gap: 8px; }
+  .text-row input { flex: 1; padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; }
+  .text-row input:focus { border-color: #4f46e5; }
+  .text-row button { padding: 9px 18px; background: #1a1a2e; color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+  .text-row button:hover { background: #2d2d4e; }
+  .footer { padding: 0.75rem 1.5rem; text-align: center; font-size: 11px; color: #bbb; border-top: 1px solid #f0f0f0; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="avatar">🤖</div>
+    <div>
+      <h1>Assistant vocal IA</h1>
+      <p>Llama 3.3 70B via Groq</p>
+    </div>
+    <span class="badge">✓ Gratuit</span>
+  </div>
+
+  <div class="setup">
+    <label>Clé API Groq</label>
+    <div class="key-row">
+      <input type="password" id="apiKey" placeholder="gsk_..." />
+      <button id="saveBtn">Valider</button>
+    </div>
+    <p class="setup-hint">🔒 Stockée localement uniquement &nbsp;·&nbsp; <a href="https://console.groq.com/keys" target="_blank">Obtenir une clé gratuite</a></p>
+  </div>
+
+  <div class="voice-row">
+    <select id="voiceSelect"><option>Chargement des voix...</option></select>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="msg bot">Bonjour ! Entrez votre clé Groq puis cliquez sur le micro 🎤</div>
+  </div>
+
+  <div class="controls">
+    <div class="mic-row">
+      <button id="micBtn" title="Parler">🎤</button>
+      <span id="status">Clé API requise</span>
+    </div>
+    <div class="text-row">
+      <input type="text" id="textInput" placeholder="Ou tapez votre message..." />
+      <button id="sendBtn">Envoyer</button>
+    </div>
+  </div>
+
+  <div class="footer">Web Speech API (Chrome/Edge) · Groq API · 14 400 req/jour gratuits</div>
+</div>
+
+<script>
+const messagesEl = document.getElementById('messages');
+const micBtn = document.getElementById('micBtn');
+const statusEl = document.getElementById('status');
+const voiceSelect = document.getElementById('voiceSelect');
+const textInput = document.getElementById('textInput');
+const sendBtn = document.getElementById('sendBtn');
+const apiKeyInput = document.getElementById('apiKey');
+const saveBtn = document.getElementById('saveBtn');
+
+let groqKey = '';
+let voices = [];
+let isListening = false;
+let isSpeaking = false;
+let history = [];
+
+// ---- Charger les voix ----
+function loadVoices() {
+  const all = speechSynthesis.getVoices();
+  voices = all.filter(v => v.lang.startsWith('fr'));
+  if (!voices.length) voices = all;
+  voiceSelect.innerHTML = voices.map((v, i) =>
+    `<option value="${i}">${v.name} (${v.lang})</option>`
+  ).join('');
+}
+loadVoices();
+speechSynthesis.onvoiceschanged = loadVoices;
+
+// ---- Sauvegarder la clé ----
+saveBtn.addEventListener('click', () => {
+  const k = apiKeyInput.value.trim();
+  if (!k.startsWith('gsk_')) {
+    statusEl.textContent = 'Clé invalide (doit commencer par gsk_)';
+    return;
+  }
+  groqKey = k;
+  apiKeyInput.value = '••••••••••••••••';
+  saveBtn.textContent = '✓ OK';
+  saveBtn.disabled = true;
+  statusEl.textContent = 'Cliquez sur le micro pour parler';
+});
+
+// ---- Ajouter un message ----
+function addMsg(text, role) {
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  d.textContent = text;
+  messagesEl.appendChild(d);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return d;
+}
+
+// ---- Synthèse vocale ----
+function speak(text) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const v = voices[parseInt(voiceSelect.value)];
+  if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = 'fr-FR'; }
+  u.rate = 1.05;
+  u.onstart = () => {
+    isSpeaking = true;
+    micBtn.className = 'speaking';
+    micBtn.textContent = '🔊';
+    statusEl.textContent = 'Lecture en cours...';
+  };
+  u.onend = () => {
+    isSpeaking = false;
+    micBtn.className = '';
+    micBtn.textContent = '🎤';
+    statusEl.textContent = 'Cliquez sur le micro pour parler';
+  };
+  speechSynthesis.speak(u);
+}
+
+// ---- Appel API Groq ----
+async function askGroq(userMsg) {
+  if (!groqKey) { statusEl.textContent = 'Entrez votre clé API d\'abord'; return; }
+  history.push({ role: 'user', content: userMsg });
+  const typing = addMsg('...', 'bot typing');
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + groqKey
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: 'Tu es un assistant vocal sympa et concis. Réponds toujours en français, en phrases courtes adaptées à la synthèse vocale. Pas de markdown ni de listes à puces, juste du texte naturel.'
+          },
+          ...history
+        ],
+        max_tokens: 300
+      })
+    });
+    const data = await res.json();
+    if (data.error) {
+      typing.textContent = 'Erreur : ' + data.error.message;
+      typing.classList.remove('typing');
+      return;
+    }
+    const reply = data.choices?.[0]?.message?.content || 'Pas de réponse.';
+    history.push({ role: 'assistant', content: reply });
+    typing.textContent = reply;
+    typing.classList.remove('typing');
+    speak(reply);
+  } catch (e) {
+    typing.textContent = 'Erreur réseau.';
+    typing.classList.remove('typing');
+  }
+}
+
+// ---- Gestion de l'input ----
+function handleInput(text) {
+  if (!text.trim()) return;
+  addMsg(text, 'user');
+  textInput.value = '';
+  askGroq(text);
+}
+
+// ---- Reconnaissance vocale ----
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+if (SR) {
+  recognition = new SR();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = false;
+  recognition.onresult = e => handleInput(e.results[0][0].transcript);
+  recognition.onend = () => {
+    isListening = false;
+    if (!isSpeaking) {
+      micBtn.className = '';
+      micBtn.textContent = '🎤';
+      statusEl.textContent = 'Cliquez sur le micro pour parler';
+    }
+  };
+  recognition.onerror = () => {
+    isListening = false;
+    micBtn.className = '';
+    micBtn.textContent = '🎤';
+    statusEl.textContent = 'Micro indisponible — utilisez le texte';
+  };
+} else {
+  micBtn.disabled = true;
+  statusEl.textContent = 'Micro non supporté — utilisez le champ texte';
+}
+
+micBtn.addEventListener('click', () => {
+  if (!groqKey) { statusEl.textContent = 'Entrez votre clé API d\'abord'; return; }
+  if (!recognition) return;
+  if (isListening) { recognition.stop(); return; }
+  speechSynthesis.cancel();
+  isListening = true;
+  micBtn.className = 'listening';
+  micBtn.textContent = '⏹';
+  statusEl.textContent = 'Écoute en cours...';
+  recognition.start();
+});
+
+sendBtn.addEventListener('click', () => handleInput(textInput.value));
+textInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleInput(textInput.value); });
+</script>
+</body>
+</html>
