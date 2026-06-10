@@ -24,12 +24,43 @@ body{
   box-shadow:0 0 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(180,140,60,0.08);
 }
 
+/* ETOILES */
+.stars-wrap{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+}
+.star{
+  position:absolute;border-radius:50%;
+  background:#fff;opacity:0;
+  animation:twinkle var(--d) var(--delay) infinite;
+}
+@keyframes twinkle{
+  0%,100%{opacity:0;transform:scale(0.5)}
+  50%{opacity:var(--op);transform:scale(1)}
+}
+.shooting{
+  position:absolute;
+  width:120px;height:1.5px;
+  background:linear-gradient(90deg,rgba(255,255,255,0),#c9a84c,rgba(255,255,255,0));
+  border-radius:2px;
+  opacity:0;
+  animation:shoot var(--sd) var(--sdelay) infinite;
+  transform-origin:left center;
+}
+@keyframes shoot{
+  0%{opacity:0;transform:translateX(-20px) translateY(0) rotate(var(--angle));}
+  10%{opacity:1;}
+  70%{opacity:0.6;}
+  100%{opacity:0;transform:translateX(200px) translateY(60px) rotate(var(--angle));}
+}
+
 /* HEADER */
 .header{
   padding:22px 24px 18px;
   border-bottom:1px solid rgba(180,140,60,0.15);
   display:flex;align-items:center;gap:16px;
   background:linear-gradient(180deg,#171208 0%,#120f0a 100%);
+  position:relative;
+  overflow:hidden;
 }
 .logo{
   width:46px;height:46px;border-radius:4px;
@@ -222,6 +253,7 @@ body{
 <div class="widget">
 
   <div class="header">
+    <div class="stars-wrap" id="starsWrap"></div>
     <div class="logo"><img id="logoImg" alt="JERCAT"/></div>
     <div class="htext">
       <h1>Assistant vocal <em>IA</em></h1>
