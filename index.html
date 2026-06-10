@@ -464,21 +464,27 @@ function createRec(){
   const r=new SR();
   r.lang='fr-FR';
   r.continuous=false;
-  r.interimResults=false;
+  r.interimResults=true;
   r.maxAlternatives=1;
-  r.onstart=()=>{statusEl.textContent='Parlez maintenant...';};
-  r.onspeechstart=()=>{statusEl.textContent='Voix détectée...';};
+  let finalTxt='';
+  r.onstart=()=>{finalTxt='';statusEl.textContent='Parlez...';};
   r.onresult=e=>{
-    const txt=Array.from(e.results).map(r=>r[0].transcript).join('');
-    if(txt.trim()){setTimeout(()=>send(txt.trim()),80);}
+    let interim='';
+    finalTxt='';
+    for(let i=0;i<e.results.length;i++){
+      if(e.results[i].isFinal)finalTxt+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    if(interim)statusEl.textContent='"'+interim+'"';
+    if(finalTxt.trim()){r.stop();}
   };
-  r.onnomatch=()=>{statusEl.textContent='Rien compris, réessayez.';};
   r.onend=()=>{
     isListening=false;
     micBtn.className='';micBtn.textContent='🎤';
     statusEl.textContent='Cliquez sur le micro pour parler';
     setWave(false);
     rec=null;
+    if(finalTxt.trim())send(finalTxt.trim());
   };
   r.onerror=(e)=>{
     isListening=false;
