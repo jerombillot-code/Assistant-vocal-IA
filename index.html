@@ -176,6 +176,35 @@ body{
 }
 #sendBtn:hover{background:linear-gradient(135deg,#c9a84c,#e8c86c);transform:scale(1.04);}
 
+/* CONTACT BAR */
+.contact-bar{
+  display:flex;gap:8px;padding:10px 20px;
+  border-top:1px solid rgba(180,140,60,0.1);
+  background:#0e0c09;
+}
+.contact-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 8px;border-radius:4px;
+  font-size:12px;font-weight:500;text-decoration:none;
+  letter-spacing:0.03em;transition:all 0.2s;
+  border:1px solid transparent;
+}
+.contact-btn.telegram{
+  background:rgba(0,136,204,0.1);color:#4aabdb;
+  border-color:rgba(0,136,204,0.2);
+}
+.contact-btn.telegram:hover{background:rgba(0,136,204,0.2);border-color:rgba(0,136,204,0.4);}
+.contact-btn.messenger{
+  background:rgba(0,120,255,0.1);color:#5a9eff;
+  border-color:rgba(0,120,255,0.2);
+}
+.contact-btn.messenger:hover{background:rgba(0,120,255,0.2);border-color:rgba(0,120,255,0.4);}
+.contact-btn.email{
+  background:rgba(180,140,60,0.1);color:#c9a84c;
+  border-color:rgba(180,140,60,0.2);
+}
+.contact-btn.email:hover{background:rgba(180,140,60,0.2);border-color:rgba(180,140,60,0.4);}
+
 /* FOOTER */
 .footer{
   padding:10px 24px;
@@ -232,6 +261,20 @@ body{
     <button id="sendBtn">↑</button>
   </div>
 
+  <div class="contact-bar">
+    <a href="https://t.me/JEROME1978" target="_blank" class="contact-btn telegram">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.26 13.947l-2.94-.92c-.64-.203-.653-.64.136-.954l11.5-4.433c.534-.194 1.003.131.938.581z"/></svg>
+      Telegram
+    </a>
+    <a href="https://m.me/jerome.billot.1978" target="_blank" class="contact-btn messenger">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.163 0 11.527c0 3.635 1.82 6.874 4.666 9.008V24l4.259-2.34c1.138.315 2.343.486 3.575.486 6.627 0 12-5.163 12-11.527C24 5.163 18.627 0 12 0zm1.191 15.528L9.97 12.134l-6.237 3.394 6.861-7.286 3.275 3.394 6.165-3.394-6.843 7.286z"/></svg>
+      Messenger
+    </a>
+    <a href="mailto:jercat.bilman@gmail.com" class="contact-btn email">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      Email
+    </a>
+  </div>
   <div class="footer">
     <div class="footer-left">Propulsé par <a href="https://web-jercat.vercel.app" target="_blank">Jercat.dev</a></div>
     <div class="footer-right">Web Speech · Groq</div>
@@ -272,6 +315,28 @@ PROCESSUS :
 Si un visiteur veut un devis, oriente-le vers le formulaire de contact ou le Telegram @JEROME1978. Sois chaleureux, professionnel et concis.
 
 CONNAISSANCES GÉNÉRALISTES — tu peux répondre à toutes ces questions et bien plus :
+
+POURQUOI CRÉER UN SITE INTERNET — arguments convaincants à utiliser :
+1. Visibilité 24h/24 et 7j/7 : votre site travaille même quand vous dormez, vos clients peuvent vous trouver à toute heure.
+2. Crédibilité : 75% des consommateurs jugent la crédibilité d'une entreprise par son site web. Sans site, vous perdez des clients avant même de les rencontrer.
+3. Nouveaux clients en continu : grâce au référencement Google, votre site attire des prospects qualifiés qui cherchent exactement ce que vous proposez.
+4. Moins cher qu'une publicité traditionnelle : un site internet est l'outil marketing le plus rentable — chaque visiteur est un client potentiel sans coût supplémentaire.
+5. Devancer la concurrence : vos concurrents ont déjà un site. Si ce n'est pas vous qui apparaissez sur Google, c'est eux.
+6. Vitrine professionnelle permanente : présentez vos services, photos, avis clients et tarifs sans effort — disponible partout dans le monde.
+7. Automatiser les demandes : formulaire de contact, prise de rendez-vous, commandes en ligne — votre site gère ça automatiquement à votre place.
+8. Indépendance des réseaux sociaux : Facebook ou Instagram peuvent supprimer votre page du jour au lendemain. Votre site vous appartient pour toujours.
+9. Collecte d'avis et témoignages : un site permet d'afficher vos avis clients et de rassurer les nouveaux prospects avant même qu'ils vous contactent.
+10. Vendre en ligne sans boutique physique : un e-commerce permet de vendre partout en France et en Europe sans frais de loyer ni de personnel.
+11. Image professionnelle : une adresse email professionnelle avec votre domaine inspire confiance. contact@votreentreprise.fr vaut bien mieux que gmail.
+12. Analyser vos visiteurs : Google Analytics vous dit qui visite votre site, d'où ils viennent et ce qui les intéresse — des données précieuses pour votre stratégie.
+13. Accessible depuis un smartphone : 60% des recherches Google se font sur mobile. Un site responsive capte ces visiteurs que vous ratez sans site adapté.
+14. Support client automatisé : une FAQ ou un chatbot sur votre site répond aux questions courantes sans que vous ayez à décrocher le téléphone.
+15. Augmenter le panier moyen : un site e-commerce peut suggérer des produits complémentaires et augmenter automatiquement vos ventes.
+16. Toucher une clientèle nationale : une boutique physique touche votre ville. Un site touche toute la France, voire l'Europe entière.
+17. Fidéliser vos clients : newsletter, blog, offres exclusives — un site permet de rester en contact avec vos clients existants et de les faire revenir.
+18. Réduire les appels répétitifs : horaires, tarifs, adresse, services — tout est sur votre site, vos clients trouvent l'info sans vous appeler.
+19. Valoriser votre entreprise : un site professionnel augmente la valeur perçue de votre activité et justifie des tarifs plus élevés.
+20. Investissement rentable à vie : contrairement à une pub qui s'arrête quand on arrête de payer, un site continue de travailler pour vous indéfiniment.
 
 WEB & CRÉATION DE SITE :
 Le SEO (référencement naturel) consiste à optimiser un site pour apparaître en haut de Google sans payer. Les facteurs clés sont : contenu de qualité, vitesse de chargement, mots-clés, liens entrants, responsive mobile. Un nom de domaine coûte entre 10 et 20€ par an. L'hébergement web coûte entre 3 et 30€ par mois selon les besoins. Un site vitrine prend en général 1 à 4 semaines à créer. WordPress est un CMS qui permet de gérer son site sans coder — il représente 43% des sites mondiaux. Shopify est la plateforme e-commerce la plus populaire, à partir de 29€ par mois. Une landing page est une page unique optimisée pour convertir des visiteurs en clients. Le HTTPS est un protocole de sécurité indispensable pour tout site professionnel. Le responsive design signifie que le site s'adapte automatiquement à tous les écrans.
