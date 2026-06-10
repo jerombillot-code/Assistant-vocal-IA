@@ -456,14 +456,16 @@ function send(text){
   if(!text.trim())return;
   addMsg(text,'user');textInput.value='';askBot(text);
 }
+const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if(isMobile){micBtn.disabled=true;micBtn.style.opacity="0.3";statusEl.textContent="Saisie texte uniquement sur mobile";}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null;
-if(SR){
+if(!isMobile&&SR){
   rec=new SR();rec.lang='fr-FR';rec.interimResults=false;
   rec.onresult=e=>send(e.results[0][0].transcript);
   rec.onend=()=>{isListening=false;if(!isSpeaking){micBtn.className='';micBtn.textContent='🎤';statusEl.textContent='Cliquez sur le micro pour parler';setWave(false);}};
   rec.onerror=()=>{isListening=false;micBtn.className='';micBtn.textContent='🎤';setWave(false);};
-}else{micBtn.disabled=true;statusEl.textContent='Micro non supporté';}
+}else if(!isMobile){micBtn.disabled=true;statusEl.textContent="Micro non supporté";}
 micBtn.addEventListener('click',()=>{
   if(!rec)return;
   if(isListening){rec.stop();return;}
