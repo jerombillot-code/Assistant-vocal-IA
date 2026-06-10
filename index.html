@@ -458,25 +458,64 @@ function send(text){
 }
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null;
+
+function initRec(){
+  if(!SR)return;
+  rec=new SR();
+  rec.lang='fr-FR';
+  rec.interimResults=false;
+  rec.onresult=e=>{
+    const txt=e.results[0][0].transcript;
+    setTimeout(()=>send(txt),100);
+  };
+  rec.onend=()=>{
+    isListening=false;
+    micBtn.className='';micBtn.textContent='🎤';
+    statusEl.textContent='Cliquez sur le micro pour parler';
+    setWave(false);
+  };
+  rec.onerror=(e)=>{
+    isListening=false;
+    micBtn.className='';micBtn.textContent='🎤';
+    setWave(false);
+    if(e.error==='not-allowed'){statusEl.textContent='Permission micro refusée';}
+    else{statusEl.textContent='Erreur micro : '+e.error;}
+  };
+}
+
 if(SR){
-  rec=new SR();rec.lang='fr-FR';rec.interimResults=false;
-  rec.onresult=e=>send(e.results[0][0].transcript);
-  rec.onend=()=>{isListening=false;if(!isSpeaking){micBtn.className='';micBtn.textContent='🎤';statusEl.textContent='Cliquez sur le micro pour parler';setWave(false);}};
-  rec.onerror=()=>{isListening=false;micBtn.className='';micBtn.textContent='🎤';statusEl.textContent='Cliquez sur le micro pour parler';setWave(false);};
-}else{micBtn.disabled=true;statusEl.textContent="Micro non supporté sur ce navigateur";}
+  initRec();
+}else{
+  micBtn.disabled=true;
+  statusEl.textContent="Micro non supporté sur ce navigateur";
+}
+
 micBtn.addEventListener('click',()=>{
-  if(!rec)return;
+  if(!SR){return;}
   if(isListening){rec.stop();return;}
-  speechSynthesis.cancel();
-  isListening=true;micBtn.className='listening';micBtn.textContent='⏹';
-  statusEl.textContent='Écoute en cours...';setWave(true);
-  try{rec.start();}catch(e){isListening=false;micBtn.className='';micBtn.textContent='🎤';setWave(false);}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(()=>{
+    speechSynthesis.cancel();
+    if(!rec)initRec();
+    isListening=true;
+    micBtn.className='listening';micBtn.textContent='⏹';
+    statusEl.textContent='Écoute en cours...';
+    setWave(true);
+    try{rec.start();}catch(e){initRec();rec.start();}
+  }).catch(()=>{
+    statusEl.textContent='Permission micro refusée';
+  });
 });
-function doSend(){const v=textInput.value.trim();if(v){send(v);}}
+
+function doSend(){
+  textInput.blur();
+  setTimeout(()=>{
+    const v=textInput.value.trim();
+    if(v)send(v);
+  },100);
+}
 sendBtn.addEventListener('click',doSend);
-sendBtn.addEventListener('touchend',function(e){e.preventDefault();doSend();});
+sendBtn.addEventListener('touchstart',function(e){e.preventDefault();doSend();},{passive:false});
 textInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doSend();}});
-textInput.addEventListener('keyup',e=>{if(e.key==='Enter'){e.preventDefault();}});
 </script>
 </body>
 </html>
