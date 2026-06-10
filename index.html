@@ -459,59 +459,59 @@ function send(text){
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null;
 
-function initRec(){
-  if(!SR)return;
-  rec=new SR();
-  rec.lang='fr-FR';
-  rec.interimResults=false;
-  rec.onresult=e=>{
-    const txt=e.results[0][0].transcript;
-    setTimeout(()=>send(txt),100);
+function createRec(){
+  if(!SR)return null;
+  const r=new SR();
+  r.lang='fr-FR';
+  r.continuous=false;
+  r.interimResults=false;
+  r.maxAlternatives=1;
+  r.onstart=()=>{statusEl.textContent='Parlez maintenant...';};
+  r.onspeechstart=()=>{statusEl.textContent='Voix détectée...';};
+  r.onresult=e=>{
+    const txt=Array.from(e.results).map(r=>r[0].transcript).join('');
+    if(txt.trim()){setTimeout(()=>send(txt.trim()),80);}
   };
-  rec.onend=()=>{
+  r.onnomatch=()=>{statusEl.textContent='Rien compris, réessayez.';};
+  r.onend=()=>{
     isListening=false;
     micBtn.className='';micBtn.textContent='🎤';
     statusEl.textContent='Cliquez sur le micro pour parler';
     setWave(false);
+    rec=null;
   };
-  rec.onerror=(e)=>{
+  r.onerror=(e)=>{
     isListening=false;
     micBtn.className='';micBtn.textContent='🎤';
     setWave(false);
-    if(e.error==='not-allowed'){statusEl.textContent='Permission micro refusée';}
-    else{statusEl.textContent='Erreur micro : '+e.error;}
+    rec=null;
+    if(e.error==='not-allowed')statusEl.textContent='Permission micro refusée';
+    else if(e.error==='no-speech')statusEl.textContent='Aucune voix détectée';
+    else statusEl.textContent='Erreur : '+e.error;
   };
+  return r;
 }
 
-if(SR){
-  initRec();
-}else{
-  micBtn.disabled=true;
-  statusEl.textContent="Micro non supporté sur ce navigateur";
-}
+if(!SR){micBtn.disabled=true;statusEl.textContent="Micro non supporté";}
 
 micBtn.addEventListener('click',()=>{
-  if(!SR){return;}
-  if(isListening){rec.stop();return;}
-  navigator.mediaDevices.getUserMedia({audio:true}).then(()=>{
+  if(!SR)return;
+  if(isListening&&rec){rec.stop();return;}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+    stream.getTracks().forEach(t=>t.stop());
     speechSynthesis.cancel();
-    if(!rec)initRec();
+    rec=createRec();
     isListening=true;
     micBtn.className='listening';micBtn.textContent='⏹';
     statusEl.textContent='Écoute en cours...';
     setWave(true);
-    try{rec.start();}catch(e){initRec();rec.start();}
-  }).catch(()=>{
-    statusEl.textContent='Permission micro refusée';
-  });
+    setTimeout(()=>{try{rec.start();}catch(e){isListening=false;micBtn.className='';micBtn.textContent='🎤';setWave(false);}},200);
+  }).catch(()=>{statusEl.textContent='Permission micro refusée';});
 });
 
 function doSend(){
   textInput.blur();
-  setTimeout(()=>{
-    const v=textInput.value.trim();
-    if(v)send(v);
-  },100);
+  setTimeout(()=>{const v=textInput.value.trim();if(v)send(v);},100);
 }
 sendBtn.addEventListener('click',doSend);
 sendBtn.addEventListener('touchstart',function(e){e.preventDefault();doSend();},{passive:false});
