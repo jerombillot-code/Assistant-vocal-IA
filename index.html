@@ -456,25 +456,27 @@ function send(text){
   if(!text.trim())return;
   addMsg(text,'user');textInput.value='';askBot(text);
 }
-const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-if(isMobile){micBtn.disabled=true;micBtn.style.opacity="0.3";statusEl.textContent="Saisie texte uniquement sur mobile";}
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null;
-if(!isMobile&&SR){
+if(SR){
   rec=new SR();rec.lang='fr-FR';rec.interimResults=false;
   rec.onresult=e=>send(e.results[0][0].transcript);
   rec.onend=()=>{isListening=false;if(!isSpeaking){micBtn.className='';micBtn.textContent='🎤';statusEl.textContent='Cliquez sur le micro pour parler';setWave(false);}};
-  rec.onerror=()=>{isListening=false;micBtn.className='';micBtn.textContent='🎤';setWave(false);};
-}else if(!isMobile){micBtn.disabled=true;statusEl.textContent="Micro non supporté";}
+  rec.onerror=()=>{isListening=false;micBtn.className='';micBtn.textContent='🎤';statusEl.textContent='Cliquez sur le micro pour parler';setWave(false);};
+}else{micBtn.disabled=true;statusEl.textContent="Micro non supporté sur ce navigateur";}
 micBtn.addEventListener('click',()=>{
   if(!rec)return;
   if(isListening){rec.stop();return;}
   speechSynthesis.cancel();
   isListening=true;micBtn.className='listening';micBtn.textContent='⏹';
-  statusEl.textContent='Écoute en cours...';setWave(true);rec.start();
+  statusEl.textContent='Écoute en cours...';setWave(true);
+  try{rec.start();}catch(e){isListening=false;micBtn.className='';micBtn.textContent='🎤';setWave(false);}
 });
-sendBtn.addEventListener('click',()=>send(textInput.value));
-textInput.addEventListener('keydown',e=>{if(e.key==='Enter')send(textInput.value);});
+function doSend(){const v=textInput.value.trim();if(v){send(v);}}
+sendBtn.addEventListener('click',doSend);
+sendBtn.addEventListener('touchend',function(e){e.preventDefault();doSend();});
+textInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doSend();}});
+textInput.addEventListener('keyup',e=>{if(e.key==='Enter'){e.preventDefault();}});
 </script>
-<div id="jercat-bounce" style="position:fixed;bottom:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;overflow:hidden;"><img id="jercat-logo" src="logo-jercat.png" alt="JERCAT" style="position:absolute;width:90px;height:90px;pointer-events:auto;cursor:grab;user-select:none;filter:drop-shadow(0 0 10px rgba(0,150,255,0.5));"/></div><script>(function(){const logo=document.getElementById("jercat-logo");const stage=document.getElementById("jercat-bounce");let x=100,y=100,vx=2.2,vy=1.8,speed=1,dragging=false,dox=0,doy=0;const S=90;function W(){return window.innerWidth;}function H(){return window.innerHeight;}function tick(){if(!dragging){x+=vx*speed;y+=vy*speed;if(x<=0){x=0;vx=Math.abs(vx);logo.style.transform="scaleX(-1)";}else if(x>=W()-S){x=W()-S;vx=-Math.abs(vx);logo.style.transform="scaleX(1)";}if(y<=0){y=0;vy=Math.abs(vy);}else if(y>=H()-S){y=H()-S;vy=-Math.abs(vy);}logo.style.left=x+"px";logo.style.top=y+"px";}requestAnimationFrame(tick);}logo.addEventListener("mousedown",function(e){dragging=true;dox=e.clientX-x;doy=e.clientY-y;logo.style.cursor="grabbing";e.preventDefault();});document.addEventListener("mousemove",function(e){if(!dragging)return;x=Math.max(0,Math.min(W()-S,e.clientX-dox));y=Math.max(0,Math.min(H()-S,e.clientY-doy));logo.style.left=x+"px";logo.style.top=y+"px";});document.addEventListener("mouseup",function(){dragging=false;logo.style.cursor="grab";});logo.addEventListener("touchstart",function(e){dragging=true;var t=e.touches[0];dox=t.clientX-x;doy=t.clientY-y;},{passive:true});document.addEventListener("touchmove",function(e){if(!dragging)return;var t=e.touches[0];x=Math.max(0,Math.min(W()-S,t.clientX-dox));y=Math.max(0,Math.min(H()-S,t.clientY-doy));logo.style.left=x+"px";logo.style.top=y+"px";},{passive:true});document.addEventListener("touchend",function(){dragging=false;});logo.addEventListener("dblclick",function(){speed=speed>=4?1:speed+1;});tick();})();</script></body>
+</body>
 </html>
